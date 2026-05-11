@@ -111,7 +111,12 @@ async fn main() -> anyhow::Result<()> {
             Ok(())
         }
         Cmd::Mcp => {
-            glimpse_mcp::run_stdio(|_| true).await?;
+            // The CLI invocation is a direct user action, so allow all
+            // capture tools. The daemon plugs in a real prompt-based gate.
+            fn allow_all(_client_id: &str) -> bool {
+                true
+            }
+            glimpse_mcp::run_stdio(allow_all).await?;
             Ok(())
         }
         Cmd::Version => {

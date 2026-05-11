@@ -44,7 +44,7 @@ windows = { version = "0.58", features = [
 ] }
 
 # Async
-tokio = { version = "1.40", features = ["rt-multi-thread", "macros", "sync", "io-std", "signal", "time"] }
+tokio = { version = "1.40", features = ["rt-multi-thread", "macros", "sync", "io-std", "io-util", "signal", "time"] }
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
