@@ -38,6 +38,12 @@ fn main() -> Result<()> {
     // first hold starts.
     ring::spawn()?;
 
+    // Spawn the system tray icon. Failure here is non-fatal — users on
+    // systems without a taskbar (rare) still get the gesture, just no UI.
+    if let Err(e) = tray::spawn() {
+        tracing::warn!(error = ?e, "tray icon could not be installed; continuing headless");
+    }
+
     // Channel: hook thread → main loop.
     let (tx, rx) = mpsc::channel::<GestureEvent>();
 
