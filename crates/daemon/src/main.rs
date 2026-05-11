@@ -34,6 +34,10 @@ fn main() -> Result<()> {
     let config = glimpse_core::Config::load()?;
     glimpse_core::capture::init_dpi_awareness();
 
+    // Spawn the cursor-ring overlay thread up front so it's ready when the
+    // first hold starts.
+    ring::spawn()?;
+
     // Channel: hook thread → main loop.
     let (tx, rx) = mpsc::channel::<GestureEvent>();
 
@@ -63,10 +67,8 @@ fn main() -> Result<()> {
             thread::sleep(Duration::from_millis(16));
         })?;
 
-    let mut gesture = Gesture::new(
-        Duration::from_millis(config.hold_ms),
-        config.drift_limit_px,
-    );
+    let hold_threshold = Duration::from_millis(config.hold_ms);
+    let mut gesture = Gesture::new(hold_threshold, config.drift_limit_px);
 
     // Main event loop.
     while let Ok(event) = rx.recv() {
@@ -74,14 +76,19 @@ fn main() -> Result<()> {
             GestureOutcome::Idle => {}
             GestureOutcome::HoldStarted { began_at } => {
                 tracing::debug!(?began_at, "hold started");
-                // TODO: ring::show(cursor)
+                // Cursor position is fetched lazily so the ring lands where the
+                // gesture actually began, not where the last mouse event was.
+                if let Ok((cx, cy)) = glimpse_core::capture::cursor_position() {
+                    ring::show(cx, cy, hold_threshold);
+                }
             }
             GestureOutcome::HoldCancelled => {
                 tracing::debug!("hold cancelled");
-                // TODO: ring::hide()
+                ring::hide();
             }
             GestureOutcome::Fire => {
                 tracing::info!("gesture fired");
+                ring::hide();
                 hook::suppress_until_release();
                 if let Err(e) = on_fire(&config) {
                     tracing::error!(error = ?e, "Fire handler failed");
