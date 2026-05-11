@@ -6,6 +6,8 @@
 //!   - `glimpse version` — print version.
 //!   - `glimpse langs`   — list OCR languages installed locally.
 
+mod permission;
+
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -111,12 +113,10 @@ async fn main() -> anyhow::Result<()> {
             Ok(())
         }
         Cmd::Mcp => {
-            // The CLI invocation is a direct user action, so allow all
-            // capture tools. The daemon plugs in a real prompt-based gate.
-            fn allow_all(_client_id: &str) -> bool {
-                true
-            }
-            glimpse_mcp::run_stdio(allow_all).await?;
+            // First MCP capture per client triggers a topmost Windows
+            // permission prompt; the decision is cached for the rest of
+            // this server's lifetime.
+            glimpse_mcp::run_stdio(permission::check_with_prompt).await?;
             Ok(())
         }
         Cmd::Version => {
