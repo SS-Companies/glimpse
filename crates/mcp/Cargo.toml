@@ -1,0 +1,23 @@
+[package]
+name = "glimpse-mcp"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Glimpse Model Context Protocol server: ocr_at_cursor, ocr_region, read_clipboard."
+
+[lib]
+name = "glimpse_mcp"
+path = "src/lib.rs"
+
+[dependencies]
+glimpse-core = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+schemars = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+anyhow = { workspace = true }

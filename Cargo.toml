@@ -1,0 +1,81 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/core",
+    "crates/daemon",
+    "crates/mcp",
+    "crates/cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+authors = ["Glimpse contributors"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/CHANGE_ME/glimpse"
+homepage = "https://github.com/CHANGE_ME/glimpse"
+description = "Hold both mouse buttons, read any text on screen. For humans and AI agents."
+
+[workspace.dependencies]
+glimpse-core = { path = "crates/core" }
+glimpse-mcp = { path = "crates/mcp" }
+
+# Windows interop
+windows = { version = "0.58", features = [
+    "Foundation",
+    "Graphics_Imaging",
+    "Media_Ocr",
+    "Globalization",
+    "Storage_Streams",
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_Graphics_Dxgi",
+    "Win32_Graphics_Direct3D11",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Threading",
+    "Win32_System_DataExchange",
+    "Win32_System_Memory",
+    "Win32_System_Ole",
+] }
+
+# Async
+tokio = { version = "1.40", features = ["rt-multi-thread", "macros", "sync", "io-std", "signal", "time"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+schemars = "0.8"
+
+# Errors / logging
+thiserror = "1.0"
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-appender = "0.2"
+
+# Paths
+directories = "5"
+
+# UI
+eframe = { version = "0.28", default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }
+egui = "0.28"
+tray-icon = "0.14"
+
+# CLI
+clap = { version = "4.5", features = ["derive"] }
+
+# Updates
+self_update = { version = "0.41", features = ["archive-zip", "compression-zip-deflate"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+opt-level = 3
+panic = "abort"
+
+[profile.dev]
+opt-level = 1

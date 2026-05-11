@@ -1,0 +1,26 @@
+# Rust
+/target
+Cargo.lock.bak
+**/*.rs.bk
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Logs / local data
+*.log
+logs/
+*.db
+*.sqlite
+
+# Build artifacts
+dist/
+*.exe.bak

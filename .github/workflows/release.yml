@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build release binaries
+        run: cargo build --workspace --release
+
+      - name: Stage artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item target\release\glimpse.exe dist\glimpse.exe
+          Copy-Item target\release\glimpse-daemon.exe dist\glimpse-daemon.exe
+          Get-FileHash dist\glimpse.exe -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  glimpse.exe"
+          } | Out-File -FilePath dist\glimpse.exe.sha256 -Encoding ascii
+          Get-FileHash dist\glimpse-daemon.exe -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  glimpse-daemon.exe"
+          } | Out-File -FilePath dist\glimpse-daemon.exe.sha256 -Encoding ascii
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/glimpse.exe
+            dist/glimpse-daemon.exe
+            dist/glimpse.exe.sha256
+            dist/glimpse-daemon.exe.sha256
+          draft: false
+          prerelease: ${{ contains(github.ref, '-') }}
+          generate_release_notes: true

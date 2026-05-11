@@ -1,0 +1,22 @@
+[package]
+name = "glimpse"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Glimpse CLI: glimpse capture, glimpse mcp, glimpse version."
+
+[[bin]]
+name = "glimpse"
+path = "src/main.rs"
+
+[dependencies]
+glimpse-core = { workspace = true }
+glimpse-mcp = { workspace = true }
+clap = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

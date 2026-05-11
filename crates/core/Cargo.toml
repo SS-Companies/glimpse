@@ -1,0 +1,20 @@
+[package]
+name = "glimpse-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Glimpse core: OCR, screen capture, gesture state machine."
+
+[dependencies]
+windows = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+directories = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
