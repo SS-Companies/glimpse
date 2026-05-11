@@ -34,7 +34,12 @@ enum Cmd {
         /// Skip the post-OCR cleanup pipeline and print raw OCR output.
         #[arg(long)]
         raw: bool,
+        /// Do not push the OCR result to the system clipboard.
+        #[arg(long)]
+        no_copy: bool,
     },
+    /// Read the system clipboard and print it to stdout.
+    Clipboard,
     /// List OCR-capable languages installed on this machine.
     Langs,
     /// Run the MCP stdio server (for use under an MCP client like Claude Code).
@@ -54,6 +59,7 @@ async fn main() -> anyhow::Result<()> {
             language,
             at,
             raw,
+            no_copy,
         } => {
             glimpse_core::capture::init_dpi_awareness();
 
@@ -82,10 +88,20 @@ async fn main() -> anyhow::Result<()> {
                 glimpse_core::cleanup::clean(&ocr.text)
             };
 
-            // stderr: which language was used (diagnostic).
+            if !no_copy && !out.is_empty() {
+                glimpse_core::clipboard::set_text(&out)?;
+            }
+
+            // stderr: which language was used + copy state (diagnostic).
             // stdout: the text. Easy to pipe.
-            eprintln!("[lang={}]", ocr.language);
+            let copied = if no_copy || out.is_empty() { "" } else { " [copied]" };
+            eprintln!("[lang={}]{copied}", ocr.language);
             println!("{out}");
+            Ok(())
+        }
+        Cmd::Clipboard => {
+            let text = glimpse_core::clipboard::get_text()?;
+            print!("{text}");
             Ok(())
         }
         Cmd::Langs => {
