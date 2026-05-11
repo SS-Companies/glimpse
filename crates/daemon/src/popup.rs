@@ -146,8 +146,11 @@ unsafe fn run() -> anyhow::Result<()> {
     .context("CreateWindowExW edit")?;
 
     // Subclass the EDIT control. Save the previous WndProc address so the
-    // subclass can chain to it.
-    let prev_raw = SetWindowLongPtrW(edit, GWLP_WNDPROC, edit_subproc as isize);
+    // subclass can chain to it. SetWindowLongPtrW takes a numeric address;
+    // the cast from a fn pointer is intentional for the Win32 ABI.
+    #[allow(clippy::fn_to_numeric_cast)]
+    let new_proc = edit_subproc as isize;
+    let prev_raw = SetWindowLongPtrW(edit, GWLP_WNDPROC, new_proc);
     OLD_EDIT_PROC.store(prev_raw, Ordering::SeqCst);
 
     // Stash the edit hwnd on the parent for easy retrieval in parent_proc.

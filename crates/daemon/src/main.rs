@@ -159,7 +159,7 @@ fn on_fire(config: &glimpse_core::Config) -> Result<()> {
 fn truncate(s: &str, max_chars: usize) -> String {
     let mut out: String = s.chars().take(max_chars).collect();
     if s.chars().count() > max_chars {
-        out.push_str("…");
+        out.push('…');
     }
     out
 }

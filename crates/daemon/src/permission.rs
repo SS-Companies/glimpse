@@ -1,4 +1,12 @@
 //! Per-session permission state for MCP agent captures.
+//!
+//! This module is a placeholder for a future tray-driven permission store
+//! that the daemon will use once it embeds the MCP server in-process. v1
+//! ships the actual prompt logic in the `glimpse mcp` CLI subcommand
+//! (`crates/cli/src/permission.rs`). Marked `#[allow(dead_code)]` until the
+//! daemon embeds MCP.
+
+#![allow(dead_code)]
 
 use std::collections::HashMap;
 use std::sync::Mutex;

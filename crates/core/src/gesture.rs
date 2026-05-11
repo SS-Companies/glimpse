@@ -116,10 +116,8 @@ impl Gesture {
                 };
                 return GestureOutcome::HoldStarted { began_at: now };
             }
-        } else if self.left_down || self.right_down {
-            if matches!(self.state, State::Neutral) {
-                self.state = State::OneDown;
-            }
+        } else if (self.left_down || self.right_down) && matches!(self.state, State::Neutral) {
+            self.state = State::OneDown;
         }
         GestureOutcome::Idle
     }

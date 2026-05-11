@@ -3,11 +3,11 @@
 //! Implements the Model Context Protocol over a line-delimited JSON-RPC 2.0
 //! stdio transport. Exposes three tools to AI agents:
 //!
-//! - `ocr_at_cursor`     — capture the screen region around the current
-//!                         cursor and return the OCR'd text.
-//! - `ocr_region`        — capture an arbitrary screen rectangle and return
-//!                         the OCR'd text.
-//! - `read_clipboard`    — return the current clipboard text.
+//! - `ocr_at_cursor` — capture the screen region around the current cursor
+//!   and return the OCR'd text.
+//! - `ocr_region` — capture an arbitrary screen rectangle and return the
+//!   OCR'd text.
+//! - `read_clipboard` — return the current clipboard text.
 //!
 //! The first call from a given client triggers an external permission check
 //! (the [`PermissionCheck`] closure passed to [`run_stdio`]). This lets the

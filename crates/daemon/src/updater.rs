@@ -5,12 +5,12 @@
 //! 1. Sleep 30 seconds after daemon startup (so a transient launch slow-down
 //!    is never the user's fault).
 //! 2. Loop forever:
-//!    a. Parse owner/repo from `CARGO_PKG_REPOSITORY`.
-//!    b. Ask GitHub for the latest published release tag via the `self_update`
-//!       crate.
-//!    c. Compare against `env!("CARGO_PKG_VERSION")`. If the release is
-//!       strictly greater, store its version in [`AVAILABLE_VERSION`] and log.
-//!    d. Sleep 24 hours.
+//!    - Parse owner/repo from `CARGO_PKG_REPOSITORY`.
+//!    - Ask GitHub for the latest published release tag via the
+//!      `self_update` crate.
+//!    - Compare against `env!("CARGO_PKG_VERSION")`. If the release is
+//!      strictly greater, store its version in [`AVAILABLE_VERSION`].
+//!    - Sleep 24 hours.
 //!
 //! What we deliberately do **not** do here:
 //! - Silently replace the running binary. The user always opts in.
@@ -40,6 +40,10 @@ const REPOSITORY_URL: &str = env!("CARGO_PKG_REPOSITORY");
 static AVAILABLE_VERSION: OnceLock<Mutex<Option<String>>> = OnceLock::new();
 
 /// Most recent newer version detected by the background poll.
+///
+/// Reserved for the tray menu to surface an "Update available" entry; the
+/// poll thread already publishes here.
+#[allow(dead_code)]
 pub fn available_version() -> Option<String> {
     AVAILABLE_VERSION
         .get()
