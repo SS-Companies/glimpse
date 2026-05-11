@@ -1,14 +1,20 @@
 # Glimpse
 
-> Hold both mouse buttons, read any text on screen. For humans and AI agents.
+<p align="center">
+  <img src="docs/assets/hero.svg" alt="Glimpse — hold both mouse buttons, read any text on screen" width="100%">
+</p>
 
-Glimpse is a Windows-native tool that turns any pixel of text — in videos, images, games, PDFs, browsers, anywhere — into copyable text. Hover over the text, press the left and right mouse buttons together for ~250ms, and the text is on your clipboard.
+> **Hold both mouse buttons. Read any text on screen. For humans and AI agents.**
 
-It also exposes the same capability as an **MCP server**, so AI agents like Claude Code, Cursor, and Cline can "see" your screen on demand.
+Glimpse is a Windows-native tool that turns any pixel of text — in videos, images, games, PDFs, browsers, anywhere — into copyable text. Hover over the text, press the left and right mouse buttons together for ~250 ms, and the text is on your clipboard.
+
+It also exposes the same capability as an **[MCP server](docs/MCP.md)**, so AI agents like Claude Code, Cursor, and Cline can "see" your screen on demand.
+
+> The illustration above is a synthetic placeholder. To replace it with a real recording of Glimpse on your desktop, follow [`docs/RECORDING.md`](docs/RECORDING.md). Pull requests with better demo GIFs are very welcome.
 
 ## Status
 
-🚧 **Pre-alpha.** Repo scaffolded. Code not yet written. See the v1 issue list below.
+✅ **v0.1.0 shipped** — [Download from GitHub Releases](https://github.com/SS-Companies/glimpse/releases/tag/v0.1.0). Right-click → Properties → Unblock on first run if SmartScreen warns.
 
 ## Features (v1)
 
@@ -31,12 +37,15 @@ See [`docs/PRIVACY.md`](docs/PRIVACY.md) for the full statement.
 
 ## Install
 
-> Pre-alpha. No releases yet. Once v1 ships:
+Download the two `.exe` files from the [latest release](https://github.com/SS-Companies/glimpse/releases/latest) and double-click `glimpse-daemon.exe` to start the background gesture listener. The tray icon appears immediately.
 
 ```powershell
-# Portable: download glimpse.exe from GitHub Releases, double-click to run.
-# Right-click → Properties → Unblock on first run (SmartScreen workaround).
+# Optional: verify the SHA-256 checksums
+Get-FileHash glimpse-daemon.exe -Algorithm SHA256
+# Compare against glimpse-daemon.exe.sha256 on the Releases page.
 ```
+
+On first launch Windows SmartScreen will say "unrecognized publisher". Right-click the `.exe` → Properties → tick **Unblock** → OK, then double-click again. Code-signing is on the v1.1 roadmap.
 
 `winget` and `Scoop` manifests will follow in v1.1.
 
@@ -94,3 +103,5 @@ Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE), at your 
 ## Contributing
 
 See [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md). v1 issue list is tracked in GitHub Issues.
+
+If you would like to contribute a better demo GIF, see [`docs/RECORDING.md`](docs/RECORDING.md) for the exact recipe — 5 minutes with ScreenToGif and a single PR.

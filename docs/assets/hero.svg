@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" role="img" aria-label="Glimpse — hold both mouse buttons, read any text on screen">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- background -->
+  <rect width="1280" height="400" fill="url(#bg)"/>
+
+  <!-- subtle grid -->
+  <g stroke="#1f2a3f" stroke-width="1" opacity="0.5">
+    <path d="M0 100 H1280"/>
+    <path d="M0 200 H1280"/>
+    <path d="M0 300 H1280"/>
+  </g>
+
+  <!-- LEFT: wordmark + tagline -->
+  <g font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial">
+    <text x="80" y="170" font-size="88" font-weight="800" fill="#f8fafc" letter-spacing="-2">Glimpse</text>
+    <text x="80" y="220" font-size="22" fill="#cbd5e1">Hold both mouse buttons. Read any text on screen.</text>
+    <text x="80" y="252" font-size="16" fill="#94a3b8">For humans and AI agents. Windows-native. Zero telemetry.</text>
+
+    <!-- features chips -->
+    <g font-size="13" fill="#cbd5e1">
+      <g transform="translate(80, 290)">
+        <rect width="120" height="28" rx="14" fill="#1e293b" stroke="#334155"/>
+        <text x="60" y="18" text-anchor="middle">🖱  L + R gesture</text>
+      </g>
+      <g transform="translate(208, 290)">
+        <rect width="120" height="28" rx="14" fill="#1e293b" stroke="#334155"/>
+        <text x="60" y="18" text-anchor="middle">⚡ Windows OCR</text>
+      </g>
+      <g transform="translate(336, 290)">
+        <rect width="120" height="28" rx="14" fill="#1e293b" stroke="#334155"/>
+        <text x="60" y="18" text-anchor="middle">🔌 MCP server</text>
+      </g>
+      <g transform="translate(464, 290)">
+        <rect width="120" height="28" rx="14" fill="#1e293b" stroke="#334155"/>
+        <text x="60" y="18" text-anchor="middle">🔒 No cloud</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- RIGHT: faux screen with cursor + ring -->
+  <g transform="translate(820, 80)">
+    <!-- faux app window -->
+    <rect x="0" y="0" width="380" height="240" rx="12" fill="#020617" stroke="#1f2937"/>
+    <!-- title bar -->
+    <rect x="0" y="0" width="380" height="28" rx="12" fill="#0b1220"/>
+    <rect x="0" y="14" width="380" height="14" fill="#0b1220"/>
+    <circle cx="14" cy="14" r="5" fill="#ef4444"/>
+    <circle cx="32" cy="14" r="5" fill="#f59e0b"/>
+    <circle cx="50" cy="14" r="5" fill="#10b981"/>
+
+    <!-- sample text block -->
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" fill="#cbd5e1">
+      <text x="20" y="64">The user is hovering over this</text>
+      <text x="20" y="86" font-weight="700" fill="#f8fafc">SECRET RECEIPT NUMBER 0X42</text>
+      <text x="20" y="108">in a YouTube video frame.</text>
+      <text x="20" y="142" fill="#64748b">// click both mouse buttons</text>
+      <text x="20" y="160" fill="#64748b">// to copy</text>
+    </g>
+
+    <!-- glow around the gesture point -->
+    <circle cx="220" cy="86" r="60" fill="url(#glow)"/>
+
+    <!-- the actual ring overlay -->
+    <g transform="translate(220, 86)">
+      <!-- unfilled track -->
+      <circle r="22" fill="none" stroke="#334155" stroke-width="4"/>
+      <!-- filled portion: 75% — using stroke-dasharray on a circle of circumference 2πr≈138.23 -->
+      <!-- rotate -90° so the start is at the top -->
+      <circle r="22" fill="none" stroke="#3B82F6" stroke-width="4"
+              stroke-dasharray="103.67 138.23" transform="rotate(-90)"
+              stroke-linecap="butt"/>
+    </g>
+
+    <!-- cursor arrow -->
+    <g transform="translate(214, 80)">
+      <polygon points="0,0 0,18 5,14 9,22 12,21 8,13 14,12" fill="#ffffff" stroke="#0f172a" stroke-width="1"/>
+    </g>
+
+    <!-- copied toast -->
+    <g transform="translate(190, 195)">
+      <rect width="170" height="28" rx="14" fill="#1e293b" stroke="#3B82F6"/>
+      <text x="85" y="18" text-anchor="middle" font-family="ui-sans-serif, system-ui" font-size="13" fill="#3B82F6">✓ copied to clipboard</text>
+    </g>
+  </g>
+</svg>
