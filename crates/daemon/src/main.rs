@@ -49,6 +49,10 @@ fn main() -> Result<()> {
         tracing::warn!(error = ?e, "tray icon could not be installed; continuing headless");
     }
 
+    // Spawn the daily GitHub-Releases update poll. Bails out internally
+    // if `config.auto_update_check` is false.
+    updater::spawn(&config);
+
     // Channel: hook thread → main loop.
     let (tx, rx) = mpsc::channel::<GestureEvent>();
 
