@@ -13,8 +13,8 @@ edition = "2021"
 rust-version = "1.88"
 authors = ["Glimpse contributors"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/Such-a-user/glimpse"
-homepage = "https://github.com/Such-a-user/glimpse"
+repository = "https://github.com/SS-Companies/glimpse"
+homepage = "https://github.com/SS-Companies/glimpse"
 description = "Hold both mouse buttons, read any text on screen. For humans and AI agents."
 
 [workspace.dependencies]

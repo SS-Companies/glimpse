@@ -5,7 +5,7 @@ Thanks for your interest. Glimpse is small, opinionated, and Windows-only — pl
 ## Getting started
 
 ```powershell
-git clone https://github.com/Such-a-user/glimpse
+git clone https://github.com/SS-Companies/glimpse
 cd glimpse
 cargo build
 cargo test
