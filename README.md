@@ -67,7 +67,7 @@ The first call in each session triggers a user permission prompt.
 ## Building from source
 
 ```powershell
-git clone https://github.com/CHANGE_ME/glimpse
+git clone https://github.com/Such-a-user/glimpse
 cd glimpse
 cargo build --release
 # Binaries at target\release\glimpse.exe and glimpse-daemon.exe
