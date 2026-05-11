@@ -120,7 +120,8 @@ async fn ocr_at_cursor(arguments: &Value) -> Result<String, ToolError> {
     let text = tokio::task::spawn_blocking(move || -> Result<String, glimpse_core::Error> {
         glimpse_core::capture::init_dpi_awareness();
         let (cx, cy) = glimpse_core::capture::cursor_position()?;
-        let rect = glimpse_core::capture::Rect::centred_on(cx, cy, w, h)?;
+        let rect = glimpse_core::capture::Rect::centred_on(cx, cy, w, h)?
+            .clamp_to_monitor()?;
         let frame = glimpse_core::capture::capture_region(rect)?;
         let result = glimpse_core::ocr::ocr_frame(&frame, lang.as_deref())?;
         Ok(glimpse_core::cleanup::clean(&result.text))
@@ -156,7 +157,8 @@ async fn ocr_region(arguments: &Value) -> Result<String, ToolError> {
             y: args.y,
             width: args.width,
             height: args.height,
-        };
+        }
+        .clamp_to_monitor()?;
         let frame = glimpse_core::capture::capture_region(rect)?;
         let result = glimpse_core::ocr::ocr_frame(&frame, lang.as_deref())?;
         Ok(glimpse_core::cleanup::clean(&result.text))

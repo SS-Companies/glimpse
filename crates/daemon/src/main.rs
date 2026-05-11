@@ -123,7 +123,8 @@ fn on_fire(config: &glimpse_core::Config) -> Result<()> {
         cy,
         config.capture_logical_w,
         config.capture_logical_h,
-    )?;
+    )?
+    .clamp_to_monitor()?;
     let frame = glimpse_core::capture::capture_region(rect)?;
     let ocr =
         glimpse_core::ocr::ocr_frame(&frame, config.ocr_language.as_deref())?;

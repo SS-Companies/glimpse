@@ -70,7 +70,8 @@ async fn main() -> anyhow::Result<()> {
                 None => glimpse_core::capture::cursor_position()?,
             };
 
-            let rect = glimpse_core::capture::Rect::centred_on(cx, cy, width, height)?;
+            let rect = glimpse_core::capture::Rect::centred_on(cx, cy, width, height)?
+                .clamp_to_monitor()?;
             tracing::info!(
                 "capturing region at ({cx},{cy}) size {}x{} → physical {}x{} at ({},{})",
                 width,

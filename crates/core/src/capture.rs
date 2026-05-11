@@ -7,11 +7,12 @@
 use crate::{Error, Result};
 use std::mem::size_of;
 
-use windows::Win32::Foundation::{HWND, POINT};
+use windows::Win32::Foundation::{HWND, POINT, RECT};
 use windows::Win32::Graphics::Gdi::{
     BitBlt, CreateCompatibleDC, CreateDIBSection, DeleteDC, DeleteObject, GetDC,
-    MonitorFromPoint, ReleaseDC, SelectObject, BITMAPINFO, BITMAPINFOHEADER, BI_RGB,
-    DIB_RGB_COLORS, HGDIOBJ, MONITOR_DEFAULTTONEAREST, SRCCOPY,
+    GetMonitorInfoW, MonitorFromPoint, ReleaseDC, SelectObject, BITMAPINFO,
+    BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS, HGDIOBJ, MONITORINFO,
+    MONITOR_DEFAULTTONEAREST, SRCCOPY,
 };
 use windows::Win32::UI::HiDpi::{
     GetDpiForMonitor, SetProcessDpiAwarenessContext,
@@ -76,6 +77,81 @@ impl Rect {
             width,
             height,
         })
+    }
+
+    /// Clamp this rectangle so it lies entirely within the monitor that
+    /// contains its centre point.
+    ///
+    /// Useful when [`Rect::centred_on`] was called near a screen edge — GDI
+    /// `BitBlt` of a rectangle that runs off the desktop returns garbage or
+    /// errors. Shrinks the rectangle to the monitor size if either dimension
+    /// is larger; otherwise shifts it inward without changing size.
+    pub fn clamp_to_monitor(self) -> Result<Self> {
+        let cx = self.x + (self.width as i32) / 2;
+        let cy = self.y + (self.height as i32) / 2;
+        let bounds = monitor_bounds_at(cx, cy)?;
+        Ok(clamp_against_bounds(self, bounds))
+    }
+}
+
+/// Query the bounding rectangle of the monitor containing a screen point,
+/// in virtual-desktop coordinates.
+fn monitor_bounds_at(x: i32, y: i32) -> Result<RECT> {
+    let pt = POINT { x, y };
+    unsafe {
+        let hmon = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+        if hmon.is_invalid() {
+            return Err(Error::Capture("MonitorFromPoint returned null".into()));
+        }
+        let mut info = MONITORINFO {
+            cbSize: std::mem::size_of::<MONITORINFO>() as u32,
+            ..Default::default()
+        };
+        GetMonitorInfoW(hmon, &mut info)
+            .ok()
+            .map_err(|e| Error::Capture(format!("GetMonitorInfoW: {e}")))?;
+        Ok(info.rcMonitor)
+    }
+}
+
+/// Pure-logic clamp, extracted so it is testable without a real monitor.
+fn clamp_against_bounds(rect: Rect, bounds: RECT) -> Rect {
+    let mon_w = (bounds.right - bounds.left).max(1) as u32;
+    let mon_h = (bounds.bottom - bounds.top).max(1) as u32;
+
+    // Shrink dimensions if larger than the monitor.
+    let mut w = rect.width.min(mon_w);
+    let mut h = rect.height.min(mon_h);
+
+    // Width/height must remain non-zero for downstream BitBlt.
+    if w == 0 {
+        w = 1;
+    }
+    if h == 0 {
+        h = 1;
+    }
+
+    let mut x = rect.x;
+    let mut y = rect.y;
+
+    if x < bounds.left {
+        x = bounds.left;
+    }
+    if y < bounds.top {
+        y = bounds.top;
+    }
+    if x + w as i32 > bounds.right {
+        x = bounds.right - w as i32;
+    }
+    if y + h as i32 > bounds.bottom {
+        y = bounds.bottom - h as i32;
+    }
+
+    Rect {
+        x,
+        y,
+        width: w,
+        height: h,
     }
 }
 
@@ -217,6 +293,24 @@ impl Drop for BitmapGuard {
 mod tests {
     use super::*;
 
+    fn rect(x: i32, y: i32, w: u32, h: u32) -> Rect {
+        Rect {
+            x,
+            y,
+            width: w,
+            height: h,
+        }
+    }
+
+    fn bounds(l: i32, t: i32, r: i32, b: i32) -> RECT {
+        RECT {
+            left: l,
+            top: t,
+            right: r,
+            bottom: b,
+        }
+    }
+
     #[test]
     fn zero_area_rejected() {
         let r = Rect {
@@ -226,5 +320,67 @@ mod tests {
             height: 100,
         };
         assert!(capture_region(r).is_err());
+    }
+
+    #[test]
+    fn clamp_fully_inside_is_noop() {
+        let r = rect(100, 100, 400, 100);
+        let b = bounds(0, 0, 1920, 1080);
+        let c = clamp_against_bounds(r, b);
+        assert_eq!(c.x, 100);
+        assert_eq!(c.y, 100);
+        assert_eq!(c.width, 400);
+        assert_eq!(c.height, 100);
+    }
+
+    #[test]
+    fn clamp_shifts_inward_at_left_edge() {
+        // Cursor at x=10 with a 400-wide capture would start at x=-190.
+        let r = rect(-190, 500, 400, 100);
+        let b = bounds(0, 0, 1920, 1080);
+        let c = clamp_against_bounds(r, b);
+        assert_eq!(c.x, 0);
+        assert_eq!(c.y, 500);
+        assert_eq!(c.width, 400);
+        assert_eq!(c.height, 100);
+    }
+
+    #[test]
+    fn clamp_shifts_inward_at_right_edge() {
+        // Capture would extend to x = 1900 + 400 = 2300, off the screen.
+        let r = rect(1900, 500, 400, 100);
+        let b = bounds(0, 0, 1920, 1080);
+        let c = clamp_against_bounds(r, b);
+        assert_eq!(c.x, 1520); // 1920 - 400
+        assert_eq!(c.width, 400);
+    }
+
+    #[test]
+    fn clamp_shifts_inward_at_top_edge() {
+        let r = rect(500, -50, 400, 100);
+        let b = bounds(0, 0, 1920, 1080);
+        let c = clamp_against_bounds(r, b);
+        assert_eq!(c.y, 0);
+    }
+
+    #[test]
+    fn clamp_shrinks_oversized_rect() {
+        // Capture wider than the whole monitor.
+        let r = rect(-50, 100, 3000, 100);
+        let b = bounds(0, 0, 1920, 1080);
+        let c = clamp_against_bounds(r, b);
+        assert_eq!(c.x, 0);
+        assert_eq!(c.width, 1920);
+        assert_eq!(c.height, 100);
+    }
+
+    #[test]
+    fn clamp_respects_negative_monitor_origin() {
+        // Secondary monitor positioned to the left of the primary.
+        let b = bounds(-1920, 0, 0, 1080);
+        let r = rect(-1950, 500, 400, 100);
+        let c = clamp_against_bounds(r, b);
+        assert_eq!(c.x, -1920);
+        assert_eq!(c.width, 400);
     }
 }
