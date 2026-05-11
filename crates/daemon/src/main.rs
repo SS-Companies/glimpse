@@ -38,6 +38,11 @@ fn main() -> Result<()> {
     // first hold starts.
     ring::spawn()?;
 
+    // Spawn the editable-preview popup thread (always alive, hidden by default).
+    if let Err(e) = popup::spawn() {
+        tracing::warn!(error = ?e, "popup window could not be created; continuing without preview");
+    }
+
     // Spawn the system tray icon. Failure here is non-fatal — users on
     // systems without a taskbar (rare) still get the gesture, just no UI.
     if let Err(e) = tray::spawn() {
@@ -134,7 +139,11 @@ fn on_fire(config: &glimpse_core::Config) -> Result<()> {
         "captured + copied"
     );
 
-    // TODO: popup::show_editable(cleaned, cx, cy) — for now we silently copy.
+    // Show the editable preview gated by config. The clipboard already
+    // holds the text; the popup only updates it if the user edits + Enter.
+    if config.show_preview_popup {
+        popup::show_editable(cleaned, cx, cy);
+    }
     Ok(())
 }
 
