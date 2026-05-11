@@ -4,6 +4,7 @@
 //!   - `glimpse capture` — one-shot OCR at the cursor, print to stdout.
 //!   - `glimpse mcp`     — start the MCP stdio server (for `mcpServers.command`).
 //!   - `glimpse version` — print version.
+//!   - `glimpse langs`   — list OCR languages installed locally.
 
 use clap::{Parser, Subcommand};
 
@@ -27,7 +28,15 @@ enum Cmd {
         /// BCP-47 OCR language tag. Defaults to the system language.
         #[arg(long)]
         language: Option<String>,
+        /// Override the centre point instead of using the cursor (mostly for testing).
+        #[arg(long, value_names = ["X", "Y"], number_of_values = 2)]
+        at: Option<Vec<i32>>,
+        /// Skip the post-OCR cleanup pipeline and print raw OCR output.
+        #[arg(long)]
+        raw: bool,
     },
+    /// List OCR-capable languages installed on this machine.
+    Langs,
     /// Run the MCP stdio server (for use under an MCP client like Claude Code).
     Mcp,
     /// Print version and exit.
@@ -39,11 +48,53 @@ async fn main() -> anyhow::Result<()> {
     init_tracing();
     let cli = Cli::parse();
     match cli.command {
-        Cmd::Capture { .. } => {
-            anyhow::bail!("capture not yet implemented — see crates/core/src/capture.rs");
+        Cmd::Capture {
+            width,
+            height,
+            language,
+            at,
+            raw,
+        } => {
+            glimpse_core::capture::init_dpi_awareness();
+
+            let (cx, cy) = match at {
+                Some(xy) => (xy[0], xy[1]),
+                None => glimpse_core::capture::cursor_position()?,
+            };
+
+            let rect = glimpse_core::capture::Rect::centred_on(cx, cy, width, height)?;
+            tracing::info!(
+                "capturing region at ({cx},{cy}) size {}x{} → physical {}x{} at ({},{})",
+                width,
+                height,
+                rect.width,
+                rect.height,
+                rect.x,
+                rect.y
+            );
+
+            let frame = glimpse_core::capture::capture_region(rect)?;
+            let ocr = glimpse_core::ocr::ocr_frame(&frame, language.as_deref())?;
+
+            let out = if raw {
+                ocr.text
+            } else {
+                glimpse_core::cleanup::clean(&ocr.text)
+            };
+
+            // stderr: which language was used (diagnostic).
+            // stdout: the text. Easy to pipe.
+            eprintln!("[lang={}]", ocr.language);
+            println!("{out}");
+            Ok(())
+        }
+        Cmd::Langs => {
+            for tag in glimpse_core::ocr::available_languages()? {
+                println!("{tag}");
+            }
+            Ok(())
         }
         Cmd::Mcp => {
-            // CLI invocation has no daemon to mediate permission; allow all.
             glimpse_mcp::run_stdio(|_| true).await?;
             Ok(())
         }
@@ -57,7 +108,9 @@ async fn main() -> anyhow::Result<()> {
 fn init_tracing() {
     use tracing_subscriber::{fmt, EnvFilter};
     let _ = fmt()
-        .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("warn")))
+        .with_env_filter(
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("warn")),
+        )
         .with_writer(std::io::stderr)
         .try_init();
 }

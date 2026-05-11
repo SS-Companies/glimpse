@@ -10,7 +10,7 @@ members = [
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.80"
+rust-version = "1.85"
 authors = ["Glimpse contributors"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/CHANGE_ME/glimpse"
@@ -24,6 +24,7 @@ glimpse-mcp = { path = "crates/mcp" }
 # Windows interop
 windows = { version = "0.58", features = [
     "Foundation",
+    "Foundation_Collections",
     "Graphics_Imaging",
     "Media_Ocr",
     "Globalization",
@@ -33,6 +34,7 @@ windows = { version = "0.58", features = [
     "Win32_Graphics_Dxgi",
     "Win32_Graphics_Direct3D11",
     "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_HiDpi",
     "Win32_UI_Input_KeyboardAndMouse",
     "Win32_System_LibraryLoader",
     "Win32_System_Threading",
