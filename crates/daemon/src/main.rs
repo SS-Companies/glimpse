@@ -29,7 +29,10 @@ use glimpse_core::gesture::{Gesture, GestureEvent, GestureOutcome};
 
 fn main() -> Result<()> {
     init_tracing()?;
-    tracing::info!(version = env!("CARGO_PKG_VERSION"), "glimpse-daemon starting");
+    tracing::info!(
+        version = env!("CARGO_PKG_VERSION"),
+        "glimpse-daemon starting"
+    );
 
     let config = glimpse_core::Config::load()?;
     glimpse_core::capture::init_dpi_awareness();
@@ -74,7 +77,9 @@ fn main() -> Result<()> {
         .name("glimpse-tick".into())
         .spawn(move || loop {
             if tick_tx
-                .send(GestureEvent::Tick { now: Instant::now() })
+                .send(GestureEvent::Tick {
+                    now: Instant::now(),
+                })
                 .is_err()
             {
                 break;
@@ -126,8 +131,7 @@ fn on_fire(config: &glimpse_core::Config) -> Result<()> {
     )?
     .clamp_to_monitor()?;
     let frame = glimpse_core::capture::capture_region(rect)?;
-    let ocr =
-        glimpse_core::ocr::ocr_frame(&frame, config.ocr_language.as_deref())?;
+    let ocr = glimpse_core::ocr::ocr_frame(&frame, config.ocr_language.as_deref())?;
     let cleaned = glimpse_core::cleanup::clean(&ocr.text);
 
     if cleaned.is_empty() {
@@ -172,9 +176,7 @@ fn init_tracing() -> Result<()> {
     let (nb, guard) = tracing_appender::non_blocking(file_appender);
     Box::leak(Box::new(guard)); // keep flushing for the process lifetime
 
-    let console = fmt::layer()
-        .with_writer(std::io::stderr)
-        .with_target(false);
+    let console = fmt::layer().with_writer(std::io::stderr).with_target(false);
     let file = fmt::layer().with_writer(nb).with_ansi(false);
 
     tracing_subscriber::registry()

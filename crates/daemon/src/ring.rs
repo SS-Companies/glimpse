@@ -28,17 +28,17 @@ use anyhow::Context;
 use windows::core::w;
 use windows::Win32::Foundation::{COLORREF, HMODULE, HWND, LPARAM, LRESULT, POINT, SIZE, WPARAM};
 use windows::Win32::Graphics::Gdi::{
-    CreateCompatibleDC, CreateDIBSection, DeleteDC, DeleteObject, GetDC, ReleaseDC,
-    SelectObject, AC_SRC_ALPHA, AC_SRC_OVER, BITMAPINFO, BITMAPINFOHEADER, BI_RGB,
-    BLENDFUNCTION, DIB_RGB_COLORS, HBITMAP, HDC, HGDIOBJ,
+    CreateCompatibleDC, CreateDIBSection, DeleteDC, DeleteObject, GetDC, ReleaseDC, SelectObject,
+    AC_SRC_ALPHA, AC_SRC_OVER, BITMAPINFO, BITMAPINFOHEADER, BI_RGB, BLENDFUNCTION, DIB_RGB_COLORS,
+    HBITMAP, HDC, HGDIOBJ,
 };
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, GetWindowLongPtrW,
-    PostQuitMessage, RegisterClassExW, SetTimer, SetWindowLongPtrW, ShowWindow,
-    TranslateMessage, UpdateLayeredWindow, GWLP_USERDATA, HMENU, MSG, SW_HIDE,
-    SW_SHOWNOACTIVATE, ULW_ALPHA, WM_DESTROY, WM_TIMER, WNDCLASSEXW, WS_EX_LAYERED,
-    WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TOPMOST, WS_EX_TRANSPARENT, WS_POPUP,
+    PostQuitMessage, RegisterClassExW, SetTimer, SetWindowLongPtrW, ShowWindow, TranslateMessage,
+    UpdateLayeredWindow, GWLP_USERDATA, HMENU, MSG, SW_HIDE, SW_SHOWNOACTIVATE, ULW_ALPHA,
+    WM_DESTROY, WM_TIMER, WNDCLASSEXW, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW,
+    WS_EX_TOPMOST, WS_EX_TRANSPARENT, WS_POPUP,
 };
 
 // ---------------- shared state ----------------
@@ -117,11 +117,8 @@ unsafe fn run() -> anyhow::Result<()> {
         anyhow::bail!("RegisterClassExW failed");
     }
 
-    let ex_style = WS_EX_LAYERED
-        | WS_EX_TRANSPARENT
-        | WS_EX_TOPMOST
-        | WS_EX_TOOLWINDOW
-        | WS_EX_NOACTIVATE;
+    let ex_style =
+        WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE;
 
     let hwnd = CreateWindowExW(
         ex_style,

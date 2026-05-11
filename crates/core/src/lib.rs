@@ -5,8 +5,8 @@
 //! cleanup pipeline, and config (de)serialization.
 
 pub mod capture;
-pub mod clipboard;
 pub mod cleanup;
+pub mod clipboard;
 pub mod config;
 pub mod gesture;
 pub mod ocr;

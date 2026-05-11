@@ -37,8 +37,7 @@ pub fn ocr_frame(frame: &CapturedFrame, language_tag: Option<&str>) -> Result<Oc
     }
 
     // 1. Wrap the BGRA bytes in a WinRT IBuffer via DataWriter.
-    let writer =
-        DataWriter::new().map_err(|e| Error::Ocr(format!("DataWriter::new: {e}")))?;
+    let writer = DataWriter::new().map_err(|e| Error::Ocr(format!("DataWriter::new: {e}")))?;
     writer
         .WriteBytes(&frame.pixels)
         .map_err(|e| Error::Ocr(format!("WriteBytes: {e}")))?;
@@ -109,4 +108,3 @@ pub fn available_languages() -> Result<Vec<String>> {
     }
     Ok(out)
 }
-

@@ -32,9 +32,7 @@ pub fn check_with_prompt(client_id: &str) -> bool {
 
     let decision = prompt(client_id);
 
-    map.lock()
-        .unwrap()
-        .insert(client_id.to_string(), decision);
+    map.lock().unwrap().insert(client_id.to_string(), decision);
 
     tracing::info!(
         client = %client_id,

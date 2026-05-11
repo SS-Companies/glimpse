@@ -35,13 +35,12 @@ use windows::Win32::Foundation::{HMODULE, HWND, LPARAM, LRESULT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::UI::Input::KeyboardAndMouse::{SetFocus, VK_ESCAPE, VK_RETURN};
 use windows::Win32::UI::WindowsAndMessaging::{
-    CallWindowProcW, CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW,
-    GetParent, GetWindowLongPtrW, GetWindowTextLengthW, GetWindowTextW, PostMessageW,
-    PostQuitMessage, RegisterClassExW, SendMessageW, SetWindowLongPtrW, SetWindowPos,
-    SetWindowTextW, ShowWindow, TranslateMessage, GWLP_USERDATA, GWLP_WNDPROC, HMENU,
-    HWND_TOPMOST, MSG, SWP_NOSIZE, SW_HIDE, SW_SHOW, WINDOW_EX_STYLE, WM_APP, WM_CLOSE,
-    WM_DESTROY, WM_KEYDOWN, WM_KILLFOCUS, WNDCLASSEXW, WS_BORDER, WS_CHILD,
-    WS_EX_TOOLWINDOW, WS_EX_TOPMOST, WS_POPUP, WS_VISIBLE,
+    CallWindowProcW, CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, GetParent,
+    GetWindowLongPtrW, GetWindowTextLengthW, GetWindowTextW, PostMessageW, PostQuitMessage,
+    RegisterClassExW, SendMessageW, SetWindowLongPtrW, SetWindowPos, SetWindowTextW, ShowWindow,
+    TranslateMessage, GWLP_USERDATA, GWLP_WNDPROC, HMENU, HWND_TOPMOST, MSG, SWP_NOSIZE, SW_HIDE,
+    SW_SHOW, WINDOW_EX_STYLE, WM_APP, WM_CLOSE, WM_DESTROY, WM_KEYDOWN, WM_KILLFOCUS, WNDCLASSEXW,
+    WS_BORDER, WS_CHILD, WS_EX_TOOLWINDOW, WS_EX_TOPMOST, WS_POPUP, WS_VISIBLE,
 };
 
 // ---------------- shared state ----------------
@@ -197,15 +196,7 @@ unsafe extern "system" fn parent_proc(
 
             let pos_x = ax + 12;
             let pos_y = ay + 12;
-            let _ = SetWindowPos(
-                hwnd,
-                HWND_TOPMOST,
-                pos_x,
-                pos_y,
-                0,
-                0,
-                SWP_NOSIZE,
-            );
+            let _ = SetWindowPos(hwnd, HWND_TOPMOST, pos_x, pos_y, 0, 0, SWP_NOSIZE);
 
             let _ = ShowWindow(hwnd, SW_SHOW);
 
@@ -263,7 +254,10 @@ unsafe fn commit(edit: HWND) {
     if let Err(e) = glimpse_core::clipboard::set_text(&text) {
         tracing::warn!(error = ?e, "popup commit: clipboard set failed");
     } else {
-        tracing::info!(chars = text.chars().count(), "popup commit → clipboard updated");
+        tracing::info!(
+            chars = text.chars().count(),
+            "popup commit → clipboard updated"
+        );
     }
 }
 

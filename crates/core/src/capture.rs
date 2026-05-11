@@ -9,14 +9,13 @@ use std::mem::size_of;
 
 use windows::Win32::Foundation::{HWND, POINT, RECT};
 use windows::Win32::Graphics::Gdi::{
-    BitBlt, CreateCompatibleDC, CreateDIBSection, DeleteDC, DeleteObject, GetDC,
-    GetMonitorInfoW, MonitorFromPoint, ReleaseDC, SelectObject, BITMAPINFO,
-    BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS, HGDIOBJ, MONITORINFO,
-    MONITOR_DEFAULTTONEAREST, SRCCOPY,
+    BitBlt, CreateCompatibleDC, CreateDIBSection, DeleteDC, DeleteObject, GetDC, GetMonitorInfoW,
+    MonitorFromPoint, ReleaseDC, SelectObject, BITMAPINFO, BITMAPINFOHEADER, BI_RGB,
+    DIB_RGB_COLORS, HGDIOBJ, MONITORINFO, MONITOR_DEFAULTTONEAREST, SRCCOPY,
 };
 use windows::Win32::UI::HiDpi::{
-    GetDpiForMonitor, SetProcessDpiAwarenessContext,
-    DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2, MDT_EFFECTIVE_DPI,
+    GetDpiForMonitor, SetProcessDpiAwarenessContext, DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2,
+    MDT_EFFECTIVE_DPI,
 };
 use windows::Win32::UI::WindowsAndMessaging::GetCursorPos;
 
@@ -206,15 +205,8 @@ pub fn capture_region(rect: Rect) -> Result<CapturedFrame> {
         };
 
         let mut bits_ptr: *mut std::ffi::c_void = std::ptr::null_mut();
-        let hbmp = CreateDIBSection(
-            hdc_mem,
-            &bi,
-            DIB_RGB_COLORS,
-            &mut bits_ptr,
-            None,
-            0,
-        )
-        .map_err(|e| Error::Capture(format!("CreateDIBSection: {e}")))?;
+        let hbmp = CreateDIBSection(hdc_mem, &bi, DIB_RGB_COLORS, &mut bits_ptr, None, 0)
+            .map_err(|e| Error::Capture(format!("CreateDIBSection: {e}")))?;
         if bits_ptr.is_null() {
             let _ = DeleteObject(HGDIOBJ(hbmp.0));
             return Err(Error::Capture("CreateDIBSection returned null bits".into()));

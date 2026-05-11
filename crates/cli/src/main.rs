@@ -97,7 +97,11 @@ async fn main() -> anyhow::Result<()> {
 
             // stderr: which language was used + copy state (diagnostic).
             // stdout: the text. Easy to pipe.
-            let copied = if no_copy || out.is_empty() { "" } else { " [copied]" };
+            let copied = if no_copy || out.is_empty() {
+                ""
+            } else {
+                " [copied]"
+            };
             eprintln!("[lang={}]{copied}", ocr.language);
             println!("{out}");
             Ok(())

@@ -12,10 +12,15 @@ pub enum GestureEvent {
     LeftUp,
     RightDown,
     RightUp,
-    Move { dx: i32, dy: i32 },
+    Move {
+        dx: i32,
+        dy: i32,
+    },
     /// A periodic tick (e.g. every 16ms) so the state machine can detect the
     /// hold threshold without depending on wall-clock polling externally.
-    Tick { now: Instant },
+    Tick {
+        now: Instant,
+    },
 }
 
 /// What the gesture state machine wants the daemon to do next.
@@ -172,7 +177,9 @@ mod tests {
         let mut g = Gesture::default();
         assert_eq!(g.process(GestureEvent::LeftDown), GestureOutcome::Idle);
         assert_eq!(
-            g.process(GestureEvent::Tick { now: Instant::now() }),
+            g.process(GestureEvent::Tick {
+                now: Instant::now()
+            }),
             GestureOutcome::Idle
         );
     }
@@ -190,7 +197,10 @@ mod tests {
         let mut g = Gesture::default();
         g.process(GestureEvent::LeftDown);
         g.process(GestureEvent::RightDown);
-        assert_eq!(g.process(GestureEvent::LeftUp), GestureOutcome::HoldCancelled);
+        assert_eq!(
+            g.process(GestureEvent::LeftUp),
+            GestureOutcome::HoldCancelled
+        );
     }
 
     #[test]
@@ -217,7 +227,9 @@ mod tests {
         );
         // Tick after threshold: fire.
         assert_eq!(
-            g.process(GestureEvent::Tick { now: at(base, 1_000) }),
+            g.process(GestureEvent::Tick {
+                now: at(base, 1_000)
+            }),
             GestureOutcome::Fire
         );
     }

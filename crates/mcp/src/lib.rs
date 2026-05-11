@@ -302,7 +302,10 @@ mod tests {
         let val = serde_json::to_value(&resp).unwrap();
         assert_eq!(val["id"], 1);
         assert_eq!(val["result"]["serverInfo"]["name"], "glimpse");
-        assert_eq!(val["result"]["capabilities"]["tools"], serde_json::json!({}));
+        assert_eq!(
+            val["result"]["capabilities"]["tools"],
+            serde_json::json!({})
+        );
     }
 
     #[tokio::test]
